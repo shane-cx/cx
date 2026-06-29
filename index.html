@@ -1,1 +1,683 @@
-cx主页
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📚 墨客 · 小说管理系统</title>
+    <!-- Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* --- 全局重置 & 暗色主题 --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #0e1219;
+            color: #e6edf3;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+        }
+        .container {
+            max-width: 1300px;
+            width: 100%;
+        }
+
+        /* --- 头部 --- */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.2rem;
+            border-bottom: 1px solid #2d3540;
+            padding-bottom: 1.2rem;
+        }
+        .header h1 {
+            font-weight: 500;
+            font-size: 2.1rem;
+            letter-spacing: 1px;
+            background: linear-gradient(145deg, #f0e6d0, #b8a78f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header h1 i {
+            margin-right: 12px;
+            color: #c9b28b;
+            -webkit-text-fill-color: initial;
+            color: #c9b28b;
+        }
+        .stats {
+            background: #1c232c;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            border: 1px solid #2f3a48;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        }
+        .stats span {
+            font-weight: 600;
+            color: #e2cba6;
+        }
+
+        /* --- 工具栏 --- */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 2rem;
+            justify-content: space-between;
+        }
+        .search-box {
+            display: flex;
+            flex: 1 1 260px;
+            background: #1a212a;
+            border-radius: 40px;
+            padding: 0 12px;
+            border: 1px solid #2c3643;
+            transition: 0.2s;
+        }
+        .search-box:focus-within {
+            border-color: #b8a084;
+            box-shadow: 0 0 0 3px rgba(184, 160, 132, 0.2);
+        }
+        .search-box i {
+            color: #7a8a9e;
+            align-self: center;
+            font-size: 0.95rem;
+            margin-right: 6px;
+        }
+        .search-box input {
+            background: transparent;
+            border: none;
+            padding: 10px 8px;
+            width: 100%;
+            color: #e6edf3;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .search-box input::placeholder {
+            color: #5e6e80;
+            font-weight: 300;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            background: #212a35;
+            border: none;
+            padding: 0 20px;
+            border-radius: 40px;
+            color: #e0e8ef;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #2f3a48;
+            height: 42px;
+            white-space: nowrap;
+        }
+        .btn i {
+            font-size: 0.95rem;
+            color: #b8a99a;
+        }
+        .btn-primary {
+            background: #7e6b54;
+            border-color: #9b856b;
+            color: #f2efe8;
+        }
+        .btn-primary i {
+            color: #f2efe8;
+        }
+        .btn-primary:hover {
+            background: #9b856b;
+            transform: scale(1.02);
+        }
+        .btn-danger {
+            border-color: #5f3e3e;
+            color: #e0b3b3;
+        }
+        .btn-danger:hover {
+            background: #3f2a2a;
+            border-color: #8f5a5a;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px dashed #3f4a58;
+        }
+        .btn-outline:hover {
+            background: #1f2833;
+            border-style: solid;
+        }
+
+        /* --- 卡片网格 --- */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 28px 0 20px;
+        }
+        .novel-card {
+            background: #161e27;
+            border-radius: 20px;
+            padding: 1.3rem 1.3rem 1.1rem;
+            border: 1px solid #28313e;
+            transition: 0.25s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        .novel-card:hover {
+            transform: translateY(-6px);
+            border-color: #4f5d6e;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.6);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .card-header h3 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #eee7dc;
+            letter-spacing: 0.3px;
+            word-break: break-word;
+            flex: 1;
+            margin-right: 10px;
+        }
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.25rem 0.7rem;
+            border-radius: 40px;
+            background: #2d3745;
+            color: #bcc9db;
+            border: 1px solid #3f4c5e;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+        .status-badge.连载中 { background: #2a3d3d; color: #9ed4b8; border-color: #3f6b5a; }
+        .status-badge.已完结 { background: #3a2f3f; color: #d9b8e0; border-color: #6b4f73; }
+        .status-badge.断更 { background: #3d2e2e; color: #e6b3b3; border-color: #734f4f; }
+        .card-meta {
+            font-size: 0.8rem;
+            color: #8c9aa8;
+            margin: 6px 0 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+        .card-meta i {
+            margin-right: 4px;
+            color: #b8a78f;
+            width: 16px;
+        }
+        .card-desc {
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: #cbd5e0;
+            margin: 8px 0 14px;
+            flex: 1;
+            word-break: break-word;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            border-top: 1px solid #232d3a;
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+        .card-actions .btn {
+            height: 34px;
+            padding: 0 14px;
+            font-size: 0.8rem;
+            background: #202a34;
+            border: 1px solid #31404f;
+        }
+        .card-actions .btn-edit:hover {
+            background: #3a4a5a;
+            border-color: #6d7e90;
+        }
+        .card-actions .btn-del:hover {
+            background: #4f2e2e;
+            border-color: #8f5555;
+        }
+
+        /* --- 空状态 --- */
+        .empty-state {
+            text-align: center;
+            padding: 70px 20px;
+            color: #5f7387;
+            grid-column: 1 / -1;
+        }
+        .empty-state i {
+            font-size: 3.6rem;
+            margin-bottom: 16px;
+            color: #3e4d5e;
+        }
+        .empty-state p {
+            font-size: 1.1rem;
+        }
+
+        /* --- 模态框 --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal {
+            background: #1a222c;
+            border-radius: 28px;
+            padding: 2.2rem 2rem 1.8rem;
+            max-width: 540px;
+            width: 94%;
+            border: 1px solid #354252;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn {
+            from { transform: scale(0.94); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .modal h2 {
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+            color: #e6ddd2;
+            border-left: 4px solid #b8a084;
+            padding-left: 16px;
+        }
+        .modal label {
+            display: block;
+            margin-top: 14px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #b0bfcf;
+            letter-spacing: 0.4px;
+        }
+        .modal input, .modal select, .modal textarea {
+            width: 100%;
+            padding: 10px 14px;
+            margin-top: 5px;
+            background: #10171f;
+            border: 1px solid #2f3a48;
+            border-radius: 14px;
+            color: #e2ecf5;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            outline: none;
+        }
+        .modal input:focus, .modal select:focus, .modal textarea:focus {
+            border-color: #b8a084;
+            box-shadow: 0 0 0 3px rgba(184, 160, 132, 0.15);
+        }
+        .modal textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+        .modal .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 28px;
+        }
+        .modal .btn {
+            padding: 0 28px;
+            height: 44px;
+        }
+        .btn-close-modal {
+            background: #2b3644;
+            border-color: #3b485a;
+        }
+        .btn-close-modal:hover {
+            background: #3f4d60;
+        }
+
+        /* --- 响应式 --- */
+        @media (max-width: 600px) {
+            .header { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .stats { align-self: flex-start; }
+            .toolbar { flex-direction: column; }
+            .actions { width: 100%; justify-content: stretch; }
+            .actions .btn { flex: 1; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+    <!-- 头部 -->
+    <header class="header">
+        <h1><i class="fas fa-feather-alt"></i> 墨客 · 小说管理</h1>
+        <div class="stats">
+            <i class="fas fa-book-open"></i> 藏书 <span id="totalCount">0</span> 册
+        </div>
+    </header>
+
+    <!-- 工具栏 -->
+    <div class="toolbar">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="搜索小说名、作者..." />
+        </div>
+        <div class="actions">
+            <button class="btn btn-outline" id="resetDataBtn"><i class="fas fa-undo-alt"></i> 重置示例</button>
+            <button class="btn btn-primary" id="addNovelBtn"><i class="fas fa-plus"></i> 新增小说</button>
+        </div>
+    </div>
+
+    <!-- 卡片网格 -->
+    <div class="grid" id="novelGrid">
+        <!-- 由 JavaScript 动态渲染 -->
+    </div>
+</div>
+
+<!-- ========== 模态框（新增/编辑） ========== -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <h2 id="modalTitle"><i class="fas fa-pen-fancy"></i> 编辑小说</h2>
+        <form id="novelForm">
+            <input type="hidden" id="novelId" value="" />
+            <label>小说名称 <input type="text" id="formTitle" placeholder="例如：三体" required /></label>
+            <label>作者 <input type="text" id="formAuthor" placeholder="刘慈欣" required /></label>
+            <label>状态
+                <select id="formStatus">
+                    <option value="连载中">连载中</option>
+                    <option value="已完结">已完结</option>
+                    <option value="断更">断更</option>
+                </select>
+            </label>
+            <label>简介 <textarea id="formDesc" placeholder="写一段简短的介绍……"></textarea></label>
+            <div class="form-actions">
+                <button type="button" class="btn btn-close-modal" id="cancelModalBtn">取消</button>
+                <button type="submit" class="btn btn-primary" id="saveNovelBtn"><i class="fas fa-save"></i> 保存</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        // ----- 数据操作 (localStorage 模拟文件存储) -----
+        const STORAGE_KEY = 'novel_manager_data';
+
+        // 默认示例数据
+        const DEFAULT_NOVELS = [
+            { id: '1', title: '三体', author: '刘慈欣', status: '已完结', desc: '地球人类文明和三体文明的信息交流、生死搏杀及两个文明在宇宙中的兴衰历程。' },
+            { id: '2', title: '诡秘之主', author: '爱潜水的乌贼', status: '连载中', desc: '蒸汽与机械的浪潮中，谁能触及非凡？历史和黑暗的迷雾里，又是谁在低语？' },
+            { id: '3', title: '雪中悍刀行', author: '烽火戏诸侯', status: '已完结', desc: '江湖是一张珠帘。大人物小人物，是珠子，大故事小故事，是串线。' },
+            { id: '4', title: '赘婿', author: '愤怒的香蕉', status: '断更', desc: '一个受够了勾心斗角、生死打拼的金融大鳄，重生回古代，成为商贾之家上门女婿的故事。' },
+        ];
+
+        // 读取数据，若无则初始化示例
+        function getNovels() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    return JSON.parse(stored);
+                } catch (e) {
+                    // 若数据损坏，重置
+                    resetToDefault();
+                    return JSON.parse(localStorage.getItem(STORAGE_KEY));
+                }
+            } else {
+                resetToDefault();
+                return JSON.parse(localStorage.getItem(STORAGE_KEY));
+            }
+        }
+
+        // 保存数据
+        function saveNovels(novels) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(novels));
+        }
+
+        // 重置为默认数据
+        function resetToDefault() {
+            saveNovels(DEFAULT_NOVELS);
+        }
+
+        // 生成短 id
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substring(2, 6);
+        }
+
+        // ----- 全局状态 -----
+        let novels = getNovels();
+        let editingId = null;          // 编辑时保存 id
+        let currentFilter = '';
+
+        // DOM 元素
+        const grid = document.getElementById('novelGrid');
+        const totalSpan = document.getElementById('totalCount');
+        const searchInput = document.getElementById('searchInput');
+
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const novelForm = document.getElementById('novelForm');
+        const novelId = document.getElementById('novelId');
+        const formTitle = document.getElementById('formTitle');
+        const formAuthor = document.getElementById('formAuthor');
+        const formStatus = document.getElementById('formStatus');
+        const formDesc = document.getElementById('formDesc');
+        const cancelModalBtn = document.getElementById('cancelModalBtn');
+
+        // 按钮
+        const addBtn = document.getElementById('addNovelBtn');
+        const resetBtn = document.getElementById('resetDataBtn');
+
+        // ----- 渲染函数 -----
+        function render() {
+            const filter = searchInput.value.trim().toLowerCase();
+            let filtered = novels;
+            if (filter) {
+                filtered = novels.filter(n => 
+                    n.title.toLowerCase().includes(filter) || 
+                    n.author.toLowerCase().includes(filter)
+                );
+            }
+
+            // 更新计数
+            totalSpan.textContent = novels.length;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-ghost"></i>
+                        <p>${filter ? '没有匹配的小说' : '书库空空，添加几本吧'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 构建卡片
+            let html = '';
+            filtered.forEach(novel => {
+                const statusClass = novel.status === '连载中' ? '连载中' : 
+                                   (novel.status === '已完结' ? '已完结' : '断更');
+                html += `
+                    <div class="novel-card" data-id="${novel.id}">
+                        <div class="card-header">
+                            <h3>${escapeHtml(novel.title)}</h3>
+                            <span class="status-badge ${statusClass}">${novel.status}</span>
+                        </div>
+                        <div class="card-meta">
+                            <span><i class="fas fa-user-edit"></i> ${escapeHtml(novel.author)}</span>
+                            <span><i class="fas fa-bookmark"></i> ${novel.status}</span>
+                        </div>
+                        <div class="card-desc">${escapeHtml(novel.desc || '暂无简介')}</div>
+                        <div class="card-actions">
+                            <button class="btn btn-edit" data-id="${novel.id}"><i class="fas fa-edit"></i> 编辑</button>
+                            <button class="btn btn-del" data-id="${novel.id}"><i class="fas fa-trash-alt"></i> 删除</button>
+                        </div>
+                    </div>
+                `;
+            });
+            grid.innerHTML = html;
+
+            // 重新绑定卡片事件 (委托方式也可以，但直接绑定更清晰)
+            document.querySelectorAll('.btn-edit').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    openEditModal(id);
+                });
+            });
+            document.querySelectorAll('.btn-del').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    if (confirm('确定要删除这本小说吗？')) {
+                        deleteNovel(id);
+                    }
+                });
+            });
+        }
+
+        // 简单防 XSS (只转义特殊字符)
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ----- 业务操作 -----
+        function deleteNovel(id) {
+            novels = novels.filter(n => n.id !== id);
+            saveNovels(novels);
+            render();
+        }
+
+        function openEditModal(id) {
+            const novel = novels.find(n => n.id === id);
+            if (!novel) return;
+            editingId = id;
+            novelId.value = id;
+            formTitle.value = novel.title;
+            formAuthor.value = novel.author;
+            formStatus.value = novel.status;
+            formDesc.value = novel.desc || '';
+            modalTitle.innerHTML = '<i class="fas fa-edit"></i> 编辑小说';
+            modalOverlay.classList.add('active');
+        }
+
+        function openCreateModal() {
+            editingId = null;
+            novelId.value = '';
+            formTitle.value = '';
+            formAuthor.value = '';
+            formStatus.value = '连载中';
+            formDesc.value = '';
+            modalTitle.innerHTML = '<i class="fas fa-plus-circle"></i> 新增小说';
+            modalOverlay.classList.add('active');
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+        }
+
+        // 保存 (新增或更新)
+        function handleSave(e) {
+            e.preventDefault();
+            const title = formTitle.value.trim();
+            const author = formAuthor.value.trim();
+            const status = formStatus.value;
+            const desc = formDesc.value.trim();
+
+            if (!title || !author) {
+                alert('请至少填写小说名称和作者');
+                return;
+            }
+
+            const id = novelId.value;
+            if (id) {
+                // 编辑模式
+                const index = novels.findIndex(n => n.id === id);
+                if (index !== -1) {
+                    novels[index] = { ...novels[index], title, author, status, desc };
+                }
+            } else {
+                // 新增模式
+                const newNovel = {
+                    id: generateId(),
+                    title,
+                    author,
+                    status,
+                    desc,
+                };
+                novels.push(newNovel);
+            }
+
+            saveNovels(novels);
+            closeModal();
+            render();
+        }
+
+        // 重置数据 (示例)
+        function resetData() {
+            if (confirm('将重置为示例数据，当前数据会丢失，确定吗？')) {
+                resetToDefault();
+                novels = getNovels();
+                render();
+            }
+        }
+
+        // ----- 事件绑定 -----
+        // 搜索防抖
+        let searchTimer = null;
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => render(), 200);
+        });
+
+        addBtn.addEventListener('click', openCreateModal);
+
+        resetBtn.addEventListener('click', resetData);
+
+        cancelModalBtn.addEventListener('click', closeModal);
+        // 点击蒙层关闭
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) closeModal();
+        });
+        // ESC 关闭
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modalOverlay.classList.contains('active')) {
+                closeModal();
+            }
+        });
+
+        novelForm.addEventListener('submit', handleSave);
+
+        // ----- 初始化渲染 -----
+        render();
+
+    })();
+</script>
+</body>
+</html>
